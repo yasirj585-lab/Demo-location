@@ -1,0 +1,68 @@
+09.01 8:13 PM
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Location Tracker</title>
+</head>
+<body>
+    <h2>Apni Location Dekhe</h2>
+    <button onclick="getLocation()">Location Display Karein</button>
+    <p id="status"></p>
+    <div id="map" style="height: 400px; width: 100%; margin-top: 20px;"></div>
+
+    <script>
+    function getLocation() {
+      const status = document.getElementById('status');
+      const mapDiv = document.getElementById('map');
+
+      if (!navigator.geolocation) {
+        status.textContent = 'Geolocation aapke browser mein supported nahi hai.';
+        return;
+      }
+
+      status.textContent = 'Location retrieve ho rahi hai...';
+
+      navigator.geolocation.getCurrentPosition(success, error);
+
+      function success(position) {
+        const latitude  = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        status.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+
+        // Simple map display using OpenStreetMap and Leaflet.js
+        // Agar pehle se map loaded hai to naya map banayein
+        if (window.map) {
+          window.map.remove();
+        }
+        var script1 = document.createElement('link');
+        script1.rel = 'stylesheet';
+        script1.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(script1);
+
+        var script2 = document.createElement('script');
+        script2.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        document.head.appendChild(script2);
+
+        script2.onload = function () {
+          var map = L.map('map').setView([latitude, longitude], 13);
+          window.map = map; // Store globally
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+
+          L.marker([latitude, longitude]).addTo(map)
+            .bindPopup('Yeh aapki location hai')
+            .openPopup();
+        };
+      }
+
+      function error() {
+        status.textContent = 'Location access deny kar diya gaya ya error aaya.';
+      }
+    }
+    </script>
+</body>
+</html>
+
